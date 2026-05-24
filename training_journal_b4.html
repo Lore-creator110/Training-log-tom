@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Journal — Blocco 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #161618;
+    --surface2: #1e1e21;
+    --border: #2a2a2e;
+    --accent: #c8f135;
+    --accent2: #f1c135;
+    --red: #ff4d4d;
+    --text: #e8e8ea;
+    --muted: #6b6b72;
+    --muted2: #9898a0;
+    --good: #4dff91;
+    --ok: #f1c135;
+    --bad: #ff6b35;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  .app-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .header-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .week-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: var(--muted2);
+    white-space: nowrap;
+  }
+  .week-badge span { color: var(--accent); font-weight: 600; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 16px 24px 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 16px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .2s;
+    text-transform: uppercase;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* MAIN */
+  .main { padding: 20px 24px 80px; max-width: 900px; margin: 0 auto; }
+
+  /* SECTION: LOG SESSION */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1.5px;
+    color: var(--muted2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SESSION FORM */
+  .session-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .form-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .day-selector {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .day-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: 1px;
+  }
+  .day-btn:hover { border-color: var(--accent); color: var(--text); }
+  .day-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .date-input {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    outline: none;
+  }
+
+  /* EXERCISE CARDS IN FORM */
+  .exercises-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .ex-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .ex-card:focus-within { border-color: #3a3a3e; }
+  .ex-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ex-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .ex-prescription {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .ex-toggle {
+    font-size: 16px;
+    color: var(--muted);
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .ex-card.open .ex-toggle { transform: rotate(90deg); }
+  .ex-body {
+    display: none;
+    padding: 0 16px 16px;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeIn .15s ease;
+  }
+  .ex-card.open .ex-body { display: flex; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SETS TABLE */
+  .sets-section label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .sets-table { width: 100%; border-collapse: collapse; }
+  .sets-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sets-table td { padding: 4px 4px; }
+  .set-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 8px;
+    width: 30px;
+  }
+  .set-input {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    outline: none;
+    width: 100%;
+    text-align: center;
+    transition: border-color .15s;
+  }
+  .set-input:focus { border-color: var(--accent); }
+  .set-input::placeholder { color: var(--muted); font-size: 11px; }
+  .add-set-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 4px;
+  }
+  .add-set-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* FEELING */
+  .feeling-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .feeling-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .feeling-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .feel-btn {
+    font-size: 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+  }
+  .feel-btn span {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    display: block;
+    text-align: center;
+    margin-top: 2px;
+  }
+  .feel-btn:hover { border-color: var(--muted2); }
+  .feel-btn.sel-1 { border-color: var(--red); background: rgba(255,77,77,.1); }
+  .feel-btn.sel-2 { border-color: var(--bad); background: rgba(255,107,53,.1); }
+  .feel-btn.sel-3 { border-color: var(--ok); background: rgba(241,193,53,.1); }
+  .feel-btn.sel-4 { border-color: var(--accent); background: rgba(200,241,53,.1); }
+  .feel-btn.sel-5 { border-color: var(--good); background: rgba(77,255,145,.1); }
+
+  .notes-input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 8px;
+    outline: none;
+    resize: vertical;
+    min-height: 56px;
+    width: 100%;
+    transition: border-color .15s;
+    line-height: 1.5;
+  }
+  .notes-input:focus { border-color: var(--accent); }
+  .notes-input::placeholder { color: var(--muted); }
+
+  /* VIDEO */
+  .video-row { display: flex; flex-direction: column; gap: 6px; }
+  .video-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .video-input {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 8px;
+    outline: none;
+    width: 100%;
+    transition: border-color .15s;
+  }
+  .video-input:focus { border-color: var(--accent2); }
+  .video-input::placeholder { color: var(--muted); }
+
+  /* TECH NOTE */
+  .tech-note {
+    background: rgba(200,241,53,.04);
+    border: 1px solid rgba(200,241,53,.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .tech-note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .tech-note-text {
+    font-size: 11px;
+    color: var(--muted2);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* SAVE BTN */
+  .form-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn-save {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    font-size: 16px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-save:hover { background: #d9ff50; transform: translateY(-1px); }
+  .btn-save:active { transform: translateY(0); }
+  .btn-clear {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-clear:hover { color: var(--red); border-color: var(--red); }
+
+  /* HISTORY */
+  .history-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .session-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .entry-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .entry-header:hover { background: var(--surface2); }
+  .entry-day-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1.5px;
+    font-size: 14px;
+    background: var(--accent);
+    color: #000;
+    padding: 3px 10px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .entry-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted2);
+  }
+  .entry-week {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--muted);
+  }
+  .entry-summary {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    flex: 1;
+    text-align: right;
+  }
+  .entry-body {
+    display: none;
+    padding: 0 16px 16px;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .entry-open .entry-body { display: flex; }
+
+  .entry-ex {
+    padding: 10px;
+    background: var(--surface2);
+    border-radius: 8px;
+  }
+  .entry-ex-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .feeling-dot {
+    width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+  }
+  .f1 { background: var(--red); }
+  .f2 { background: var(--bad); }
+  .f3 { background: var(--ok); }
+  .f4 { background: var(--accent); }
+  .f5 { background: var(--good); }
+
+  .sets-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .set-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 8px;
+    color: var(--text);
+  }
+  .set-chip strong { color: var(--accent2); }
+
+  .entry-note {
+    font-size: 12px;
+    color: var(--muted2);
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .video-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .video-link:hover { text-decoration: underline; }
+
+  /* PROGRESS VIEW */
+  .progress-select {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    outline: none;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 360px;
+    cursor: pointer;
+  }
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .progress-card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .chart-area {
+    padding: 20px;
+    position: relative;
+  }
+  .chart-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding: 20px;
+  }
+  /* Simple bar chart */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 100px;
+    margin-bottom: 8px;
+  }
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height .3s ease;
+    min-height: 2px;
+    position: relative;
+  }
+  .bar-load { background: var(--accent); }
+  .bar-e1rm { background: var(--accent2); opacity: .7; }
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .bar-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted2);
+    text-align: center;
+  }
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px; border-radius: 2px;
+  }
+
+  .feeling-timeline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px 20px 16px;
+  }
+  .feel-timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .feel-timeline-item .bar-label { font-size: 9px; color: var(--muted); }
+
+  /* DELETE */
+  .btn-del {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-del:hover { color: var(--red); border-color: var(--red); }
+
+  /* Week selector in form */
+  .week-select {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* Notification */
+  .notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s ease;
+    pointer-events: none;
+  }
+  .notif.show { transform: translateY(0); opacity: 1; }
+
+  /* Page display */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* e1rm chip */
+  .e1rm-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    background: rgba(241,193,53,.1);
+    border: 1px solid rgba(241,193,53,.3);
+    color: var(--accent2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+
+  /* Separator in entry */
+  .entry-body > .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="header-title">TRAINING LOG</div>
+    <div class="header-sub">BLOCCO 4 — TOM SARDY</div>
+  </div>
+  <div class="week-badge" id="currentWeekBadge">WEEK <span>—</span></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showPage('log')">📝 LOG SESSIONE</button>
+  <button class="tab" onclick="showPage('history')">📋 STORICO</button>
+  <button class="tab" onclick="showPage('progress')">📈 PROGRESSIONI</button>
+</div>
+
+<div class="main">
+
+<!-- ======= PAGE: LOG ======= -->
+<div id="page-log" class="page active">
+  <div class="section-title">Nuova Sessione</div>
+  <div class="session-form">
+    <div class="form-header">
+      <div class="day-selector" id="daySelector">
+        <button class="day-btn active" data-day="1" onclick="selectDay(1)">GIORNO 1</button>
+        <button class="day-btn" data-day="2" onclick="selectDay(2)">GIORNO 2</button>
+        <button class="day-btn" data-day="3" onclick="selectDay(3)">GIORNO 3</button>
+        <button class="day-btn" data-day="4" onclick="selectDay(4)">GIORNO 4</button>
+        <button class="day-btn" data-day="5" onclick="selectDay(5)">GIORNO 5</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select class="week-select" id="weekSelect">
+          <option value="1">WEEK 1</option>
+          <option value="2">WEEK 2</option>
+          <option value="3">WEEK 3</option>
+          <option value="4">WEEK 4</option>
+          <option value="5">WEEK 5</option>
+          <option value="6">WEEK 6</option>
+        </select>
+        <input type="date" class="date-input" id="sessionDate">
+      </div>
+    </div>
+    <div class="exercises-list" id="exercisesList"></div>
+    <div class="form-footer">
+      <button class="btn-clear" onclick="clearForm()">RESET</button>
+      <button class="btn-save" onclick="saveSession()">SALVA SESSIONE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= PAGE: HISTORY ======= -->
+<div id="page-history" class="page">
+  <div class="section-title">Storico Allenamenti</div>
+  <div id="historyContainer"></div>
+</div>
+
+<!-- ======= PAGE: PROGRESS ======= -->
+<div id="page-progress" class="page">
+  <div class="section-title">Progressioni per Esercizio</div>
+  <select class="progress-select" id="progressExSelect" onchange="renderProgress()">
+    <option value="">— Seleziona esercizio —</option>
+  </select>
+  <div id="progressContainer"></div>
+</div>
+
+</div><!-- /main -->
+
+<div class="notif" id="notif">Sessione salvata!</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const PROGRAM = {
+  1: [
+    { id: "leg_curl_singolo_piedi", name: "LEG CURL SINGOLO IN PIEDI (Panatta)", tempo: "3-1-1-1 conc.Esplosiva",
+      weeks: { 1:"2x6/8 RIR0 poi 1x10/12 RIR0",2:"2x6/8 RIR0 poi 1x10/12 RIR0",3:"2x6/8 RIR0 poi 1x10/12 RIR0",4:"2x6/8 RIR0 poi 1x10/12 RIR0",5:"2x6/8 RIR0 poi 1x10/12 RIR0",6:"2x6/8 RIR0 poi 1x10/12 RIR0" },
+      note:"Bello bloccato e ancorato, piede a martello. Allungo senza estendere del tutto le ginocchia, schiaccio forte fino in fondo, spremo i femorali e contengo la contrazione, dolcemente riallungo frenando!" },
+    { id: "squat_bil_g1", name: "SQUAT BILANCIERE", tempo: "4-1-2-1",
+      weeks: { 1:"Avv + 5x4 @90kg (disc.4\" fermo 2\")",2:"Avv + 5x4 @90kg (disc.4\" fermo 2\")",3:"Avv + 4x6 @90kg (disc.4\" fermo 2\")",4:"Avv + 6x2 @110kg (disc.4\" fermo 1\")",5:"Avv + 4x3 @110kg (disc.4\" fermo 1\")",6:"Avv + 1x4 @110kg poi 2x1 @120kg (disc.4\" fermo 1\")" },
+      note:"PARTI COMPATTO CON PANCIA E BACINO. Devi stare sul centro piede dall'inizio alla fine." },
+    { id: "leg_press_45_g1", name: "LEG PRESS 45° (+disco 15kg con elastici)", tempo: "4-1-2-0 (back off no fermo)",
+      weeks: { 1:"2 avv → Top 1x5/8 + Back Off 1x10/12",2:"2 avv → Top 1x5/8 + Back Off 1x10/12",3:"2 avv → Top 1x5/8 + Back Off 1x10/12",4:"2 avv → Top 1x5/8 + Back Off 1x10/12",5:"2 avv → Top 1x5/8 + Back Off 1x10/12",6:"2 avv → Top 1x5/8 + Back Off 1x10/12" },
+      note:"Piedi stretti e bassi, ginocchia dritte. Lascia che l'ultimo tratto si sollevi un pochino il tallone. Esci morbido dal fermo in buca senza compensare." },
+    { id: "leg_extension_g1", name: "LEG EXTENSION", tempo: "4-1-2-1",
+      weeks: { 1:"Avv + 1x15 RIR0 + 2x8/12 RIR0",2:"Avv + 1x15 RIR0 + 2x8/12 RIR0",3:"Avv + 1x15 RIR0 + 2x8/12 RIR0",4:"Avv + 1x15 RIR0 + 2x8/12 RIR0",5:"Avv + 1x15 RIR0 + 2x8/12 RIR0",6:"Avv + 1x15 RIR0 + 2x8/12 RIR0" },
+      note:"Bello ancorato, piede a martello. Spingo con la tibia contro il pad pensando di SCHIACCIARE IN BASSO, non di alzare la gamba." },
+    { id: "rdl_manubri_g1", name: "RDL MANUBRI", tempo: "4-1-2-1",
+      weeks: { 1:"Avv + TEST 10RM poi 2x7 @10RM",2:"Avv + 4x6 @10RM (fermo 2\" in basso)",3:"Avv + 4x7 @10RM (fermo 2\" in basso)",4:"Avv + 3x8 @10RM (fermo 2\" in basso)",5:"Avv + 3x8 @10RM (fermo 2\" in basso)",6:"Avv + 2x12 @10RM (fermo 1\" in basso)" },
+      note:"Mantengo pressione sul pollicione. In risalita schiaccio coi piedi cercando di portare i femorali contro i manubri." },
+    { id: "adductor_machine_g1", name: "ADDUCTOR MACHINE", tempo: "4-1-2-1",
+      weeks: { 1:"2x8 RIR0 + 1x15 RIR0",2:"2x8 RIR0 + 1x15 RIR0",3:"2x8 RIR0 + 1x15 RIR0",4:"2x8 RIR0 + 1x15 RIR0",5:"2x8 RIR0 + 1x15 RIR0",6:"2x8 RIR0 + 1x15 RIR0" },
+      note:"Addome rilassato, unisco forte le ginocchia." },
+    { id: "alzate_lat_incrociati_g1", name: "ALZATE LATERALI CAVI INCROCIATI (cavigliere)", tempo: "3-0-2-1",
+      weeks: { 1:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)",2:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)",3:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)",4:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)",5:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)",6:"3x8/12 (1°RIR1 / 2°RIR0 / 3°RIR0)" },
+      note:"Parti bello dritto petto aperto. Inizio allontanando le braccia sul piano frontale, poi verso fine concentrica entro giù col petto e continuo ad alzare i pugni spingendoli avanti." },
+  ],
+  2: [
+    { id: "panca_piana_manubri", name: "PANCA PIANA MANUBRI", tempo: "4-1-2-0",
+      weeks: { 1:"Avv + TEST 8RM + 2x6 @8RM",2:"Avv + 4x5 @8RM",3:"Avv + 4x5 @8RM",4:"Avv + 4x6 @8RM",5:"Avv + 3x7 @8RM",6:"Avv + 3x8 @8RM" },
+      note:"Usa bene leg drive. Sterno che si alza in discesa. Scarico sul dorso, non sui deltoidi posteriori." },
+    { id: "chest_press_inc_panatta", name: "CHEST PRESS INCLINED PANATTA", tempo: "4-1-2-0",
+      weeks: { 1:"Avv + 1x5/7 RIR0 + 2x8/10 RIR1/0",2:"Avv + 1x5/7 RIR0 + 2x8/10 RIR1/0",3:"Avv + 1x5/7 RIR0 + 2x8/10 RIR1/0",4:"Avv + 1x5/7 RIR0 + 2x8/10 RIR0",5:"Avv + 1x5/7 RIR0 + 2x8/10 RIR0",6:"Avv + 1x5/7 RIR0 + 2x8/10 RIR0" },
+      note:"Sellino più alto possibile, gomiti bassi. In concentrica penso di unire i bicipiti." },
+    { id: "croci_cavi_piana_g2", name: "CROCI CAVI PANCA PIANA", tempo: "3-1-2-1",
+      weeks: { 1:"2x10/12 RIR0",2:"2x10/12 RIR0",3:"2x10/12 RIR0",4:"1x6/8 + 2x10/8 RIR0",5:"1x6/8 + 2x10/8 RIR0",6:"1x6/8 + 2x10/8 RIR0" },
+      note:"Scendo mantenendo gomito piegato a 90°, dorsali ben attivi. In concentrica alzo forte il petto e strizzo lontano, unendo i gomiti, non le mani." },
+    { id: "lat_machine_triangolo", name: "LAT MACHINE TRIANGOLO", tempo: "3-1-2-1",
+      weeks: { 1:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0",2:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0",3:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0",4:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0",5:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0",6:"Avv + 2x7/9 RIR0/1 + 1x12 RIR0" },
+      note:"Gomiti stretti, schiacciando in basso il trapezio e le scapole, senza strattonare la chiusura. Al ritorno vado in alto allungando le braccia ma senza mollare le scapole. Sguardo alto." },
+    { id: "iliac_row_machine", name: "ILIAC ROW MACHINE (maniglia extraruotata)", tempo: "3-1-2-1",
+      weeks: { 1:"2x8/12 RIR0",2:"2x8/12 RIR0",3:"2x8/12 RIR0",4:"2x8/12 RIR0",5:"2x8/12 RIR0",6:"2x8/12 RIR0" },
+      note:"Picconata con punta del gomito verso il basso e dietro. Mano che tira giù il cavo, il busto si inarca salendo per strizzare la porzione centrale E BASSA." },
+    { id: "pulley_cifosi_triang", name: "PULLEY CIFOSI TRIANGOLO", tempo: "3-1-2-1",
+      weeks: { 1:"2x8/10 RIR0 + 1x15 RIR0",2:"2x8/10 RIR0 + 1x15 RIR0",3:"2x8/10 RIR0 + 1x15 RIR0",4:"2x8/10 RIR0 + 1x15 RIR0",5:"2x8/10 RIR0 + 1x15 RIR0",6:"2x8/10 RIR0 + 1x15 RIR0" },
+      note:"Gomiti stretti, tirano verso il basso senza perdere le scapole che schiacciano sempre basse." },
+    { id: "crunch_g2", name: "CRUNCH PANCA DECLINATA + CRUNCH CORDA CAVO ALTO (in ginocchio)", tempo: "3-1-2-1",
+      weeks: { 1:"2x10/12",2:"2x10/12",3:"2x10/12",4:"2x10/12",5:"2x10/12",6:"2x10/12" },
+      note:"Crunch panca declinata + crunch corda in ginocchio al cavo alto." },
+  ],
+  3: [
+    { id: "lento_avanti_g3", name: "LENTO AVANTI MANUBRI panca 70°", tempo: "4-1-2-0",
+      weeks: { 1:"Avv + 3x6/8 RIR1",2:"Avv + 3x6/8 RIR1",3:"Avv + 3x6/8 RIR1",4:"Avv + 2x6/8 RIR1 + 1x10/12 RIR0",5:"Avv + 2x6/8 RIR1 + 1x10/12 RIR0",6:"Avv + 2x6/8 RIR1 + 1x10/12 RIR0" },
+      note:"Presa FALSA con carpo sui manubri. Gomiti e POLSI orientati sui 45°. Mentre scendo alzo lo sterno, gomito e mano sulla stessa linea, dorso che stabilizza." },
+    { id: "alzate_lat_cavo_basso", name: "ALZATE LATERALI CAVO BASSO (cavigliera)", tempo: "3-1-2-1",
+      weeks: { 1:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0",2:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0",3:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0",4:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0",5:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0",6:"3x8/12: 1x10 RIR1, 1x8 RIR0, 1x12 RIR0" },
+      note:"Pugno chiuso, petto alto e scapola schiacciata (non addotta/strizzata). Allontano il cavo avanti sfilandolo sui 30°, non lateralmente ma neanche frontalmente." },
+    { id: "alzate_lat_incrociati_g3", name: "ALZATE LATERALI CAVI INCROCIATI (cavigliere)", tempo: "3-0-2-1",
+      weeks: { 1:"2x8/10 RIR0",2:"2x8/10 RIR0",3:"2x8/10 RIR0",4:"2x8/10 RIR0",5:"2x8/10 RIR0",6:"2x8/10 RIR0" },
+      note:"Parti bello dritto petto aperto. Inizio allontanando le braccia sul piano frontale, poi verso fine concentrica entro giù col petto e continuo ad alzare i pugni spingendoli avanti." },
+    { id: "rear_delt_machine_g3", name: "REAR DELT MACHINE", tempo: "4-1-2-0",
+      weeks: { 1:"3x8/12 RIR0",2:"3x8/12 RIR0",3:"3x8/12 RIR0",4:"3x8/12 RIR0",5:"3x8/12 RIR0",6:"3x8/12 RIR0" },
+      note:"Focus delt. posteriore. Mignoli allargano, gomiti alti e larghi. SEDERE BENE SOTTO, LEGGERA CIFOSI, scapole ferme." },
+    { id: "pushdown_singolo_fune_g3", name: "PUSHDOWN SINGOLO FUNE", tempo: "4-1-2-1",
+      weeks: { 1:"4x8/10 RIR0",2:"4x8/10 RIR0",3:"4x8/10 RIR0",4:"4x8/10 RIR0",5:"4x8/10 RIR0",6:"4x8/10 RIR0" },
+      note:"Gomito più aperto schiaccia in basso lateralmente verso il basso." },
+    { id: "preacher_curl_mach_g3", name: "PREACHER CURL MACHINE PANATTA (2 braccia)", tempo: "4-1-2-1",
+      weeks: { 1:"1x6/8 RIR0 + 2x8/10 RIR0",2:"1x6/8 RIR0 + 2x8/10 RIR0",3:"1x6/8 RIR0 + 2x8/10 RIR0",4:"1x6/8 RIR0 + 2x8/10 RIR0",5:"1x6/8 RIR0 + 2x8/10 RIR0",6:"1x6/8 RIR0 + 2x8/10 RIR0" },
+      note:"Tappetino sotto i tricipiti, gomito allineato al fulcro della macchina. Stabilizza la scapola, concentrica esplosiva, eccentrica controllata specie alla fine." },
+    { id: "french_press_vulken_g3", name: "FRENCH PRESS VULKEN CAVO BASSO panca 70°", tempo: "4-1-2-1",
+      weeks: { 1:"2x8/10 RIR0 + 1x12 braccio singolo RIR0",2:"2x8/10 RIR0 + 1x12 braccio singolo RIR0",3:"2x8/10 RIR0 + 1x12 braccio singolo RIR0",4:"2x8/10 RIR0 + 1x12 braccio singolo RIR0",5:"2x8/10 RIR0 + 1x12 braccio singolo RIR0",6:"2x8/10 RIR0 + 1x12 braccio singolo RIR0" },
+      note:"Posizionati con la panca più vicina possibile al cavo. Stai più in piedi possibile con schiena appoggiata. Gomito bloccato, scendi bene fino in fondo e spingi bene verso l'alto." },
+  ],
+  4: [
+    { id: "leg_curl_singolo_g4", name: "LEG CURL SINGOLA", tempo: "4-1-2-1",
+      weeks: { 1:"Avv + 1x6/8 RIR0 + 1x12/15 RIR0",2:"Avv + 1x6/8 RIR0 + 1x12/15 RIR0",3:"Avv + 1x6/8 RIR0 + 1x12/15 RIR0",4:"Avv + 2x6/8 RIR0 + 1x15/20 RIR0",5:"Avv + 2x6/8 RIR0 + 1x15/20 RIR0",6:"Avv + 2x6/8 RIR0 + 1x15/20 RIR0" },
+      note:"Bello bloccato e ancorato, piede a martello. Allungo senza bloccare del tutto le ginocchia, schiaccio forte fino in fondo, spremo i femorali e contengo la contrazione, dolcemente riallungo frenando!" },
+    { id: "rdl_bilanciere_g4", name: "RDL BILANCIERE (no cintura, scalzo)", tempo: "4-1-2-0",
+      weeks: { 1:"Avv + 3x6 @8RM",2:"Avv + 3x6 @8RM + -20% 1x10/12 RIR0",3:"Avv + 3x7 @8RM",4:"Avv + 3x7 @8RM + -20% 1x10/12 RIR0",5:"Avv + 3x8 @8RM",6:"Avv + 3x8 @8RM + -20% 1x10/12 RIR0" },
+      note:"Schiena attiva quando stacco dal rack. Sposta baricentro avanti su avampiede (pollicione ben ancorato). Sblocca ginocchia poi fai scorrere bacino in alto e indietro. Non cascare sul tallone. In risalita cerca di riportare femorali avanti contro il bilanciere." },
+    { id: "hack_squat_g4", name: "HACK SQUAT", tempo: "4-1-2-0",
+      weeks: { 1:"Avv + TEST 10RM + 2x6 @10RM",2:"3x6 @10RM",3:"4x6 @10RM",4:"3x7 @10RM",5:"4x7 @10RM",6:"3x8 @10RM" },
+      note:"Piedi stretti e bassi, ginocchia dritte. Lascia che l'ultimo tratto si sollevi un pochino il tallone. Esci morbido dal fermo in buca senza compensare." },
+    { id: "affondi_gluteo_smith_g4", name: "AFFONDI FOCUS GLUTEO — Smith Machine piedi su step (o manubri)", tempo: "4-1-2-1",
+      weeks: { 1:"2x10/12 RIR10",2:"2x10/12 RIR10",3:"2x10/12 RIR10",4:"3x6/7 RIR1 (ultima al cedimento)",5:"3x6/7 RIR1 (ultima al cedimento)",6:"3x6/7 RIR1 (ultima al cedimento)" },
+      note:"Mentre scendi la gamba fa forza verso l'interno schiacciando con l'alluce. Busto dritto, petto aperto, sguardo avanti. Scendo bene in fondo senza andare troppo indietro col culo. Fermo in basso e strizzo il culo spingendo solo da lì." },
+    { id: "squat_machine_narrow_g4", name: "SQUAT MACHINE NARROW STANCE", tempo: "4-0-2-0",
+      weeks: { 1:"1x6/8 RIR1 + 1x12 RIR0 tensione continua",2:"1x6/8 RIR1 + 1x12 RIR0 tensione continua",3:"1x6/8 RIR1 + 1x15 RIR0 tensione continua",4:"1x6/8 RIR1 + 1x15 RIR0 tensione continua",5:"1x6/8 RIR1 + 1x20 RIR0 tensione continua",6:"1x6/8 RIR1 + 1x20 RIR0 tensione continua" },
+      note:"Busto eretto, petto su e testa su. Pedana declinata (rialzata sotto i talloni). SBLOCCO GINOCCHIA e carico i quads, spingo senza compensare dal bacino." },
+    { id: "polpacci_smith_g4", name: "POLPACCI IN PIEDI — Smith Machine o Leg Squat Machine", tempo: "4-1-2-1",
+      weeks: { 1:"3x8/10",2:"3x8/10",3:"3x8/10",4:"3x8/10",5:"3x8/10",6:"3x8/10" },
+      note:"Piedi che spingono dritti, pollicione che schiaccia costantemente contro la pedana." },
+  ],
+  5: [
+    { id: "crunch_machine_g5", name: "CRUNCH MACHINE", tempo: "3-1-2-1",
+      weeks: { 1:"4x10/12",2:"4x10/12",3:"4x10/12",4:"4x10/12",5:"4x10/12",6:"4x10/12" },
+      note:"ECCENTRICA SUPERSLOW." },
+    { id: "convergent_row_panatta", name: "CONVERGENT UPPER BACK ROW (Panatta verde e nera)", tempo: "4-1-2-1",
+      weeks: { 1:"1x7/8 RIR0 + 2x10/12 RIR0",2:"1x7/8 RIR0 + 2x10/12 RIR0",3:"1x7/8 RIR0 + 2x10/12 RIR0",4:"1x7/8 RIR0 + 2x10/12 RIR0",5:"1x7/8 RIR0 + 2x10/12 RIR0",6:"1x7/8 RIR0 + 2x10/12 RIR0" },
+      note:"Tira dal gomito e tieni la scapola sempre depressa e bloccata. NON TIRO DI SCAPOLA MA DI GOMITO. Strizzo le scapole solo in full squeeze." },
+    { id: "lat_machine_sbarra_g5", name: "LAT MACHINE SBARRA presa medio-larga", tempo: "3-1-2-1",
+      weeks: { 1:"2x7/9 RIR0",2:"2x7/9 RIR0",3:"2x7/9 RIR0",4:"2x7/9 RIR0",5:"2x7/9 RIR0",6:"2x7/9 RIR0" },
+      note:"Presa con medio e anulare tra la curvatura della sbarra. Gomiti orientati sul piano scapolare, petto alto e testa guarda costantemente su. Ricerco allungamento e contrazione della zona dorsale ascellare." },
+    { id: "chest_press_tg_neutro", name: "CHEST PRESS TECHNOGYM (maniglie presa neutra)", tempo: "3-2-2-1",
+      weeks: { 1:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0",2:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0",3:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0",4:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0",5:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0",6:"Avv + 2x6/8 RIR0 + 1x10/12 RIR0" },
+      note:"2\" di full stretch in eccentrica (rispetta il ROM articolare, tensione tutta sul petto)." },
+    { id: "chest_press_inc_tg", name: "CHEST PRESS INCLINED TECHNOGYM", tempo: "4-1-2-2",
+      weeks: { 1:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)",2:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)",3:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)",4:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)",5:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)",6:"Avv + 2x8/10 RIR0 (2\" di squeeze in alto)" },
+      note:"Sellino più alto possibile, gomiti bassi. In concentrica penso di unire i bicipiti." },
+    { id: "chest_fly_machine_inc", name: "CHEST FLY MACHINE INCLINATA (o croci cavi panca 30°)", tempo: "3-1-2-1",
+      weeks: { 1:"2x10/12 RIR0",2:"2x10/12 RIR0",3:"2x10/12 RIR0",4:"2x10/12 RIR0",5:"2x10/12 RIR0",6:"2x10/12 RIR0" },
+      note:"Petto alto in stretch. In chiusura unisci i gomiti lontani in avanti, non le mani." },
+    { id: "alzate_lat_decubito_45_g5", name: "ALZATE LATERALI decubito panca 45° manubrio", tempo: "4-0-2-1",
+      weeks: { 1:"1x15 RIR0 + 1x10/12 RIR0",2:"1x15 RIR0 + 1x10/12 RIR0",3:"1x15 RIR0 + 1x10/12 RIR0",4:"1x15 RIR0 + 1x10/12 RIR0",5:"1x15 RIR0 + 1x10/12 RIR0",6:"1x15 RIR0 + 1x10/12 RIR0" },
+      note:"Presa falsa, busto appoggiato di sbieco con petto alto, scapola schiacciata. Muovo il peso allontanandolo dal corpo con braccio teso, cerco contrazione costante sul fascio mediale." },
+    { id: "preacher_curl_2b_panatta_g5", name: "PREACHER CURL MACHINE 2 BRACCIA PANATTA (nera e rossa)", tempo: "4-1-2-1",
+      weeks: { 1:"3x8/10 RIR0",2:"3x8/10 RIR0",3:"3x8/10 RIR0",4:"3x8/10 RIR0",5:"3x8/10 RIR0",6:"3x8/10 RIR0" },
+      note:"Spalla immobile, stabilizza bene col dorso, maniglie dritte non ruotate." },
+    { id: "pushdown_2b_vulken_g5", name: "PUSHDOWN 2 BRACCIA VULKEN", tempo: "4-1-2-1",
+      weeks: { 1:"4x8/10 RIR0",2:"4x8/10 RIR0",3:"4x8/10 RIR0",4:"4x8/10 RIR0",5:"4x8/10 RIR0",6:"4x8/10 RIR0" },
+      note:"Posizionati con la panca più vicina possibile al cavo. Stai più in piedi possibile con schiena appoggiata. Gomito bloccato, scendi bene fino in fondo e spingi bene verso l'alto." },
+    { id: "hammer_curl_pad_g5", name: "HAMMER CURL MANUBRI gomiti bloccati su pad", tempo: "4-1-2-1",
+      weeks: { 1:"2x8/10 RIR0",2:"2x8/10 RIR0",3:"2x8/10 RIR0",4:"2x8/10 RIR0",5:"2x8/10 RIR0",6:"2x8/10 RIR0" },
+      note:"Presa neutra, schiaccio in basso e indietro stabilizzando bene col dorso." },
+  ]
+};
+
+const FEELING_LABELS = { 1:"💀 Pessimo",2:"😤 Faticoso",3:"😐 Neutro",4:"💪 Buono",5:"🔥 Ottimo" };
+const FEELING_CLASSES = { 1:"sel-1",2:"sel-2",3:"sel-3",4:"sel-4",5:"sel-5" };
+
+// ============================================================
+// STATE
+// ============================================================
+let currentDay = 1;
+let sessions = JSON.parse(localStorage.getItem('b4_sessions') || '[]');
+
+function save() { localStorage.setItem('b4_sessions', JSON.stringify(sessions)); }
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  document.getElementById('sessionDate').value = today.toISOString().split('T')[0];
+  detectCurrentWeek();
+  renderExercises();
+  renderHistory();
+  populateProgressSelect();
+});
+
+function detectCurrentWeek() {
+  if (sessions.length === 0) { document.getElementById('weekSelect').value = 1; updateWeekBadge(1); return; }
+  const lastW = sessions[sessions.length-1].week || 1;
+  document.getElementById('weekSelect').value = lastW;
+  updateWeekBadge(lastW);
+}
+
+function updateWeekBadge(w) {
+  document.getElementById('currentWeekBadge').innerHTML = `WEEK <span>${w}</span>`;
+}
+
+document.getElementById('weekSelect').addEventListener('change', function() {
+  updateWeekBadge(this.value);
+  renderExercises();
+});
+
+// ============================================================
+// RENDER EXERCISE FORM
+// ============================================================
+function selectDay(d) {
+  currentDay = d;
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.day) === d));
+  renderExercises();
+}
+
+function renderExercises() {
+  const week = parseInt(document.getElementById('weekSelect').value);
+  const exs = PROGRAM[currentDay];
+  const container = document.getElementById('exercisesList');
+  container.innerHTML = '';
+  exs.forEach((ex, i) => {
+    const card = document.createElement('div');
+    card.className = 'ex-card';
+    card.id = 'card_' + ex.id;
+    card.innerHTML = `
+      <div class="ex-header" onclick="toggleCard('${ex.id}')">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-prescription">${ex.weeks[week] || ''}<br><span style="color:var(--muted);font-size:9px">TEMPO ${ex.tempo}</span></div>
+        <div class="ex-toggle">›</div>
+      </div>
+      <div class="ex-body">
+        <div class="tech-note">
+          <div class="tech-note-icon">📌</div>
+          <div class="tech-note-text">${ex.note}</div>
+        </div>
+        <div class="sets-section">
+          <label>SERIE LOG</label>
+          <table class="sets-table" id="sets_${ex.id}">
+            <tr>
+              <th>#</th><th>CARICO (kg)</th><th>REPS</th><th>RIR</th>
+            </tr>
+          </table>
+          <button class="add-set-btn" onclick="addSet('${ex.id}')">+ AGGIUNGI SERIE</button>
+        </div>
+        <div class="feeling-row">
+          <label>FEELING SULL'ESERCIZIO</label>
+          <div class="feeling-btns" id="feel_${ex.id}">
+            ${[1,2,3,4,5].map(n => `<button class="feel-btn" data-ex="${ex.id}" data-val="${n}" onclick="setFeeling('${ex.id}',${n})">
+              ${n===1?'💀':n===2?'😤':n===3?'😐':n===4?'💪':'🔥'}
+              <span>${n===1?'PESSIMO':n===2?'FATICOSO':n===3?'NEUTRO':n===4?'BUONO':'OTTIMO'}</span>
+            </button>`).join('')}
+          </div>
+        </div>
+        <div class="video-row">
+          <label>🎥 LINK VIDEO (opzionale)</label>
+          <input class="video-input" id="video_${ex.id}" placeholder="https://... (YouTube, Drive, WhatsApp link...)" type="text">
+        </div>
+        <div>
+          <label style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px;">NOTE SESSIONE</label>
+          <textarea class="notes-input" id="notes_${ex.id}" placeholder="Come ti sei sentito? Tecnica, dolori, sensazioni..."></textarea>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+    // Add 3 default set rows
+    for(let s=0;s<3;s++) addSet(ex.id);
+  });
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card_' + id);
+  card.classList.toggle('open');
+}
+
+function addSet(exId) {
+  const table = document.getElementById('sets_' + exId);
+  const rowCount = table.rows.length; // includes header
+  const setNum = rowCount; // 1-indexed
+  const row = table.insertRow();
+  row.innerHTML = `
+    <td class="set-num">${setNum}</td>
+    <td><input class="set-input" placeholder="es. 80" type="number" step="0.5" id="load_${exId}_${setNum}"></td>
+    <td><input class="set-input" placeholder="es. 8" type="number" id="reps_${exId}_${setNum}"></td>
+    <td><input class="set-input" placeholder="0-3" type="number" min="0" max="5" id="rir_${exId}_${setNum}"></td>
+  `;
+}
+
+function setFeeling(exId, val) {
+  document.querySelectorAll(`[data-ex="${exId}"]`).forEach(b => {
+    b.className = 'feel-btn';
+    if(parseInt(b.dataset.val) === val) b.classList.add('sel-' + val);
+  });
+}
+
+// ============================================================
+// SAVE
+// ============================================================
+function saveSession() {
+  const week = parseInt(document.getElementById('weekSelect').value);
+  const date = document.getElementById('sessionDate').value || new Date().toISOString().split('T')[0];
+  const exs = PROGRAM[currentDay];
+  const exerciseData = [];
+
+  exs.forEach(ex => {
+    const table = document.getElementById('sets_' + ex.id);
+    if(!table) return;
+    const sets = [];
+    for(let i=1; i<table.rows.length; i++) {
+      const load = table.rows[i].querySelector(`#load_${ex.id}_${i}`)?.value;
+      const reps = table.rows[i].querySelector(`#reps_${ex.id}_${i}`)?.value;
+      const rir = table.rows[i].querySelector(`#rir_${ex.id}_${i}`)?.value;
+      if(load || reps) sets.push({ load: parseFloat(load)||0, reps: parseInt(reps)||0, rir: parseInt(rir)||0 });
+    }
+    const feelBtn = document.querySelector(`[data-ex="${ex.id}"][class*="sel-"]`);
+    const feeling = feelBtn ? parseInt(feelBtn.dataset.val) : null;
+    const notes = document.getElementById('notes_' + ex.id)?.value || '';
+    const video = document.getElementById('video_' + ex.id)?.value || '';
+    exerciseData.push({ id: ex.id, name: ex.name, sets, feeling, notes, video, prescription: ex.weeks[week] });
+  });
+
+  const session = { id: Date.now(), date, week, day: currentDay, exercises: exerciseData };
+  sessions.push(session);
+  save();
+  showNotif('✅ Sessione salvata!');
+  renderHistory();
+  populateProgressSelect();
+}
+
+function clearForm() {
+  renderExercises();
+  showNotif('Form resettato');
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['log','history','progress'][i] === name));
+  if(name === 'history') renderHistory();
+  if(name === 'progress') renderProgress();
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
+  if(sessions.length === 0) {
+    container.innerHTML = '<div class="history-empty">NESSUNA SESSIONE SALVATA<br><br>Inizia a loggare dal tab LOG SESSIONE</div>';
+    return;
+  }
+  const sorted = [...sessions].reverse();
+  container.innerHTML = sorted.map(s => {
+    const filledEx = s.exercises.filter(e => e.sets.some(set => set.load||set.reps));
+    return `
+    <div class="session-entry" id="entry_${s.id}">
+      <div class="entry-header" onclick="toggleEntry(${s.id})">
+        <div class="entry-day-badge">G${s.day}</div>
+        <div class="entry-date">${formatDate(s.date)}</div>
+        <div class="entry-week">W${s.week}</div>
+        <div class="entry-summary">${filledEx.length}/${s.exercises.length} esercizi</div>
+        <button class="btn-del" onclick="event.stopPropagation();deleteSession(${s.id})">🗑</button>
+      </div>
+      <div class="entry-body">
+        ${s.exercises.map(ex => {
+          if(!ex.sets.some(set=>set.load||set.reps) && !ex.notes && !ex.feeling) return '';
+          const e1rmTop = ex.sets.reduce((max, set) => {
+            if(!set.load||!set.reps) return max;
+            const e = calcE1RM(set.load, set.reps, set.rir||0);
+            return e > max ? e : max;
+          }, 0);
+          return `
+          <div class="entry-ex">
+            <div class="entry-ex-name">
+              ${ex.name}
+              ${ex.feeling ? `<span class="feeling-dot f${ex.feeling}" title="${FEELING_LABELS[ex.feeling]}"></span>` : ''}
+              ${e1rmTop > 0 ? `<span class="e1rm-chip">~1RM: ${e1rmTop}kg</span>` : ''}
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;">📋 ${ex.prescription||''}</div>
+            <div class="sets-display">
+              ${ex.sets.map((set,i) => set.load||set.reps ? `<div class="set-chip">S${i+1}: <strong>${set.load}kg</strong> × ${set.reps}r ${set.rir!==undefined&&set.rir!==''?`(RIR${set.rir})`:''}` : '').filter(Boolean).join('')}
+            </div>
+            ${ex.notes ? `<div class="entry-note">"${ex.notes}"</div>` : ''}
+            ${ex.video ? `<a class="video-link" href="${ex.video}" target="_blank">🎥 Guarda video</a>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleEntry(id) {
+  document.getElementById('entry_' + id)?.classList.toggle('entry-open');
+}
+
+function deleteSession(id) {
+  if(!confirm('Eliminare questa sessione?')) return;
+  sessions = sessions.filter(s => s.id !== id);
+  save();
+  renderHistory();
+  populateProgressSelect();
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function populateProgressSelect() {
+  const sel = document.getElementById('progressExSelect');
+  const existing = sel.value;
+  // Collect all exercise ids from all sessions
+  const exMap = {};
+  sessions.forEach(s => s.exercises.forEach(e => { if(!exMap[e.id]) exMap[e.id] = e.name; }));
+  sel.innerHTML = '<option value="">— Seleziona esercizio —</option>';
+  Object.entries(exMap).forEach(([id, name]) => {
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  if(existing) sel.value = existing;
+}
+
+function renderProgress() {
+  const exId = document.getElementById('progressExSelect').value;
+  const container = document.getElementById('progressContainer');
+  if(!exId) { container.innerHTML = ''; return; }
+
+  // Gather all logs for this exercise
+  const logs = [];
+  sessions.forEach(s => {
+    const ex = s.exercises.find(e => e.id === exId);
+    if(!ex) return;
+    const topLoad = ex.sets.reduce((m,set) => set.load > m ? set.load : m, 0);
+    const topE1RM = ex.sets.reduce((m,set) => {
+      if(!set.load||!set.reps) return m;
+      const e = calcE1RM(set.load, set.reps, set.rir||0);
+      return e > m ? e : m;
+    }, 0);
+    const totalVolume = ex.sets.reduce((sum,set) => sum + (set.load||0)*(set.reps||0), 0);
+    logs.push({ date: s.date, week: s.week, day: s.day, topLoad, topE1RM, feeling: ex.feeling, notes: ex.notes, sets: ex.sets, totalVolume, prescription: ex.prescription });
+  });
+  logs.sort((a,b) => a.date.localeCompare(b.date));
+
+  if(logs.length === 0) { container.innerHTML = '<div class="chart-empty">Nessun dato per questo esercizio.</div>'; return; }
+
+  const maxLoad = Math.max(...logs.map(l=>l.topLoad), 1);
+  const maxE1RM = Math.max(...logs.map(l=>l.topE1RM), 1);
+  const maxRef = Math.max(maxLoad, maxE1RM);
+
+  container.innerHTML = `
+  <div class="progress-card">
+    <div class="progress-card-header">
+      <div class="progress-card-title">${document.getElementById('progressExSelect').options[document.getElementById('progressExSelect').selectedIndex].text}</div>
+    </div>
+    <div class="chart-area">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">CARICO TOP SET & ~1RM STIMATO</div>
+      <div class="bar-chart">
+        ${logs.map(l => `
+          <div class="bar-group">
+            <div class="bar-value" style="font-size:8px;color:var(--muted2)">${l.topLoad>0?l.topLoad+'kg':''}</div>
+            <div class="bar bar-load" style="height:${Math.round((l.topLoad/maxRef)*80)}px" title="${l.topLoad}kg"></div>
+            ${l.topE1RM > 0 ? `<div class="bar bar-e1rm" style="height:${Math.round((l.topE1RM/maxRef)*80)}px;margin-top:-${Math.round((l.topE1RM/maxRef)*80)}px;opacity:0.4" title="~1RM: ${l.topE1RM}kg"></div>` : ''}
+            <div class="bar-label">${formatDateShort(l.date)}<br>W${l.week}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Top Load</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent2);opacity:.7"></div>~1RM stimato</div>
+      </div>
+    </div>
+    <div style="padding:0 20px 16px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:10px;padding-top:12px;border-top:1px solid var(--border)">FEELING PER SESSIONE</div>
+      <div class="feeling-timeline">
+        ${logs.map(l => l.feeling ? `
+          <div class="feel-timeline-item">
+            <div style="font-size:18px">${l.feeling===1?'💀':l.feeling===2?'😤':l.feeling===3?'😐':l.feeling===4?'💪':'🔥'}</div>
+            <div class="bar-label">${formatDateShort(l.date)}</div>
+          </div>` : '').join('')}
+      </div>
+    </div>
+    <div style="padding:0 20px 16px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:10px;padding-top:12px;border-top:1px solid var(--border)">STORICO SESSIONI DETTAGLIO</div>
+      ${logs.map(l => `
+        <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2)">${formatDate(l.date)} — W${l.week} G${l.day}</span>
+            ${l.feeling ? `<span style="font-size:14px">${l.feeling===1?'💀':l.feeling===2?'😤':l.feeling===3?'😐':l.feeling===4?'💪':'🔥'}</span>` : ''}
+            ${l.topE1RM > 0 ? `<span class="e1rm-chip">~1RM: ${l.topE1RM}kg</span>` : ''}
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:6px;">📋 ${l.prescription||''}</div>
+          <div class="sets-display">
+            ${l.sets.map((set,i) => set.load||set.reps ? `<div class="set-chip">S${i+1}: <strong>${set.load}kg</strong> × ${set.reps}r ${set.rir!==undefined&&set.rir!==''?`RIR${set.rir}`:''}</div>` : '').filter(Boolean).join('')}
+          </div>
+          ${l.notes ? `<div class="entry-note" style="margin-top:6px">"${l.notes}"</div>` : ''}
+          ${l.totalVolume > 0 ? `<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px">Vol: ${l.totalVolume.toFixed(0)} kg·reps</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function calcE1RM(load, reps, rir) {
+  // Epley formula adjusted for RIR
+  const effectiveReps = reps + (rir || 0);
+  if(effectiveReps <= 1) return load;
+  return Math.round(load * (1 + effectiveReps / 30));
+}
+
+function formatDate(d) {
+  if(!d) return '';
+  const [y,m,dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+function formatDateShort(d) {
+  if(!d) return '';
+  const [y,m,dd] = d.split('-');
+  return `${dd}/${m}`;
+}
+
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
